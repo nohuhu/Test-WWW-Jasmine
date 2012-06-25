@@ -2,14 +2,27 @@ use strict;
 use warnings;
 no  warnings 'uninitialized';
 
-use Test::More tests => 8;
+use Test::More;
 
 use Test::WWW::Selenium;
+use WWW::Selenium::Util 'server_is_running';
 
 use lib 't/lib';
 use server;
 
-BEGIN { use_ok 'Test::WWW::Jasmine' }
+{
+    my ($host, $port) = server_is_running;
+
+    if ( $host and $port ) {
+        plan tests => 8;
+    }
+    else {
+        plan skip_all => "No Selenium server found.";
+        exit 0;
+    };
+}
+
+use_ok 'Test::WWW::Jasmine';
 
 my $source = <<'EEE';
 /*

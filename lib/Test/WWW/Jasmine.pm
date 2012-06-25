@@ -12,7 +12,7 @@ use WWW::Selenium;
 
 ### VERSION ###
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 ### PUBLIC CLASS METHOD (CONSTRUCTOR) ###
 #
@@ -163,7 +163,11 @@ sub _build_html {
     my $html = $self->_get_test_html;
 
     my $html_file = $self->_get_html_file_name;
-    my $file_path = ($self->html_dir =~ s{/+$}{}r) . '/' . $html_file;
+    my $html_dir  = $self->html_dir;
+
+    $html_dir =~ s{/+$}{};
+
+    my $file_path = $html_dir . '/' . $html_file;
 
     {
         open my $fh, '>:utf8', $file_path or
@@ -174,7 +178,10 @@ sub _build_html {
 
     $self->{file_path} = $file_path;
 
-    my $url = ($self->{browser_url} =~ s{/+$}{}r) . '/' . $html_file;
+    my $browser_url = $self->{browser_url};
+    $browser_url =~ s{/+$}{};
+
+    my $url = $browser_url . '/' . $html_file;
 
     return $url;
 }
@@ -526,6 +533,7 @@ Run Test::WWW::Jasmine:
      jasmine_url => 'http://myserver/jasmine/jasmine.js',
      html_dir    => '/filesystem/path/to/htdocs/test',
      browser_url => 'http://myserver/test',
+     selenium    => $custom_selenium_object,
  );
  
  $jasmine->run();
@@ -622,10 +630,13 @@ is downloaded and eval'ed at the time @script keyword is encountered.
 This matches usual browser behavior; it also means that the test spec
 JavaScript itself will be evaluated *after* all C<@script>s are processed.
 
+You can place any word character (x by convention) before keyword to
+disable it temporarily.
+
 =head1 DEPENDENCIES
 
 Test::WWW::Jasmine depends on the following modules:
-L<WWW::Selenium>.
+L<Test::WWW::Selenium>.
 
 =head1 SEE ALSO
 
